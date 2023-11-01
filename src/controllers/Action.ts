@@ -1,5 +1,7 @@
-import { PrismaClient } from '@prisma/client'
-const prisma = new PrismaClient()
+import { PrismaClient, Prisma } from '@prisma/client'
+const prisma = new PrismaClient({
+    errorFormat: 'minimal'
+})
 
 async function readActions(req: any, res: any){
     res.json(await prisma.actions.findMany())
@@ -25,17 +27,31 @@ async function deleteActions(req: any, res: any){
 }
 
 async function createAction(req: any, res: any){
-    console.log(req.body)
-    const action = {
-        idAction: req.body.idAction,
-        topicName: req.body.topicName,
-        table: req.body.table
-    }
-    await prisma.actions.create({
-        data: {...action}
-    })
+    try {
+        console.log(req.body)
+        const action = {
+            idAction: req.body.idAction,
+            topicName: req.body.topicName,
+            table: req.body.table
+        }
+        await prisma.actions.create({
+            data: {...action}
+        })
 
-    res.json({})
+        res.json({})
+    } catch (error: any) {
+        if(error.message.includes('is missing')) {
+            const message = error.message.split('Argument')[1].replaceAll('`', '').trim()
+            return res.status(500).json({
+                message
+                })
+        }
+        // console.error(error)
+        res.status(500).json({
+            message: error
+        })
+    }
+
 }
 
 const action = {

@@ -1,15 +1,26 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+    provider = "mongodb"
+    url      = env("DATABASE_URL")
 }
 
 model Actions {
-  id        String @id @default(auto()) @map("_id") @db.ObjectId
-  idAction  Int
-  table     String
-  topicName String
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    idAction  Int
+    table     String
+    topicName String
+}
+
+model User {
+    id        String @id @default(auto()) @map("_id") @db.ObjectId
+    createdAt DateTime @default(now())
+    name      String
+    email     String   @unique
+    password  String
+    tokenConfirmation String?
+    tokenConfirmationExpiration DateTime?
+    active Boolean @default(false)
 }
